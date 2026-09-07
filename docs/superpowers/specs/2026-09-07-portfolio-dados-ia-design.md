@@ -29,7 +29,7 @@ O site precisa cumprir duas funções sem que uma atrapalhe a outra:
 | Decisão | Escolha | Motivo |
 |---|---|---|
 | Natureza da "Newsletter" | Blog estático em MDX no repositório | Sem backend, sem banco, sem serviço de e-mail, sem custo. Publicar = commit. |
-| Stack | Next.js 15 (App Router) + Tailwind v4 + MDX | Stack mais reconhecida no mercado brasileiro; o próprio repositório vira argumento em entrevista. |
+| Stack | Next.js 16 (App Router) + Tailwind v4 + MDX | Stack mais reconhecida no mercado brasileiro; o próprio repositório vira argumento em entrevista. |
 | Renderização | `output: 'export'` (HTML estático) | Sem servidor para manter, sem custo, sem superfície de ataque. |
 | Idiomas | Português **e** inglês | Alcance nacional e internacional. Custo assumido: cada texto existe em duas versões. |
 | Volume de conteúdo | 1 a 3 projetos, com experiência profissional real | Projetos ganham tratamento profundo em vez de grade grande e vazia. |
@@ -129,7 +129,7 @@ O `profile` e os textos de interface, ao contrário, **são obrigatórios nos do
 | Markdown estendido | `remark-gfm` |
 | Código com destaque de sintaxe | `rehype-pretty-code` |
 | Validação | `zod` |
-| Fonte | `next/font` carregando Recursive com os eixos variáveis |
+| Fonte | `next/font/google` → Recursive com `axes: ['CASL','MONO','slnt']` |
 | Métricas | `@vercel/analytics` |
 
 Nenhuma biblioteca de animação: CSS puro cobre o movimento previsto.
@@ -146,13 +146,22 @@ superfície    #0D1110
 borda         #1C2421
 texto         #E6F2EB
 secundário    #8FA39A
-terciário     #5B6B64
+terciário     #6F827A
 acento        #4ADE80
 ```
 
-Estes valores são **ponto de partida, não definitivos**: a medição de contraste (abaixo) tem precedência sobre eles e pode alterá-los.
+**Valores medidos** (2026-09-07), contraste contra `fundo` / `superfície`:
 
-**Requisito de contraste:** todo texto deve atingir **WCAG AA (4.5:1)** contra o fundo em que assenta; texto grande, 3:1. `terciário` e `acento` são os pares limítrofes — se a medição reprovar, os valores acima devem ser clareados até passarem, e o design system atualizado com os tons corrigidos. Contraste baixo em verde sobre preto é o defeito mais comum dessa estética. A verificação é obrigatória, não opcional.
+| token | contraste | AA 4.5:1 |
+|---|---|---|
+| texto `#E6F2EB` | 17.06 / 16.53 | passa |
+| secundário `#8FA39A` | 7.36 / 7.13 | passa |
+| terciário `#6F827A` | 4.81 / 4.66 | passa |
+| acento `#4ADE80` | 11.26 / 10.91 | passa |
+
+O terciário era `#5B6B64` e reprovava (3.49) — foi clareado para `#6F827A`. O acento verde passa com folga e permanece como estava.
+
+**Requisito de contraste:** todo texto deve atingir **WCAG AA (4.5:1)** contra o fundo em que assenta; texto grande, 3:1. A conformidade é garantida por teste automatizado sobre os tokens (ver seção 6), não por inspeção visual — assim qualquer alteração futura de paleta que quebre o contraste falha no CI.
 
 ### 4.2 Tipografia
 
@@ -167,7 +176,7 @@ Família única: **Recursive**, com o eixo `MONO` ajustado por contexto. É essa
 
 **Corpo de texto de artigo:** 17px, entrelinha 1.8, largura máxima ~64 caracteres. Esses três valores, somados à escolha do eixo, são o que resolve a fadiga de leitura — nenhum deles é opcional.
 
-Caso algum eixo do Recursive não seja carregável por `next/font/google`, o plano de implementação deve tratar o auto-hospedamento da fonte variável como caminho alternativo; a solução não pode degradar para uma monoespaçada comum no corpo do texto.
+**Viabilidade verificada** (2026-09-07): o arquivo variável que o Google Fonts serve para Recursive expõe os eixos `MONO` (0→1), `CASL` (0→1), `wght` (300→1000) e `slnt` (−15→0), e `next/font/google` aceita declará-los via `axes`. A variação por contexto é possível com a fonte hospedada pelo Next, sem auto-hospedagem e sem degradar para uma monoespaçada comum no corpo do texto.
 
 ### 4.3 Movimento
 
@@ -267,4 +276,4 @@ O design não depende destes itens para começar a implementação, mas o site n
 6. Currículo em PDF, versões PT e EN.
 7. Domínio a ser registrado.
 
-Enquanto não chegam, a implementação usa conteúdo de exemplo, que **não pode** ir para produção. O mecanismo é explícito: todo conteúdo de exemplo carrega o campo `placeholder: true` no frontmatter (ou na entrada correspondente do `profile`), e a validação Zod **rejeita `placeholder: true` quando `NODE_ENV === 'production'`**, quebrando o build. Assim é impossível publicar por esquecimento, e não depende de ninguém lembrar de conferir.
+Enquanto não chegam, a implementação usa conteúdo de exemplo, que **não pode** ir para produção. O mecanismo é explícito: todo conteúdo de exemplo carrega o campo `placeholder: true` no frontmatter (ou na entrada correspondente do `profile`), e a camada de conteúdo **rejeita `placeholder: true` num deploy de produção** (`VERCEL_ENV === 'production'`, ou `STRICT_CONTENT=1` para verificar localmente), quebrando o build. O gatilho não é `NODE_ENV`, porque `next build` já o define como `production` em qualquer build — usá-lo tornaria o projeto impossível de compilar enquanto houvesse conteúdo de exemplo. Assim é impossível publicar por esquecimento, e não depende de ninguém lembrar de conferir.
