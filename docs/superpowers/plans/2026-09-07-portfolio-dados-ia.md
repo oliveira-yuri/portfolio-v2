@@ -2866,7 +2866,12 @@ import { SITE_NAME, SITE_URL } from './site'
 import type { Lang, PostMeta } from './content/types'
 
 function escapeXml(value: string): string {
-  return value.replace(/[<>&'"]|[^ -]/g, (char) => {
+  // Escapes the five XML-significant characters, plus every character
+  // outside printable ASCII as a numeric entity, for maximum feed-reader
+  // compatibility. Written as [^ -~] on purpose: an \xNN range here is easy
+  // to corrupt into literal control bytes that are invisible in a source
+  // file and silently change what the character class matches.
+  return value.replace(/[<>&'"]|[^ -~]/g, (char) => {
     if (char === '<') return '&lt;'
     if (char === '>') return '&gt;'
     if (char === '&') return '&amp;'
