@@ -23,7 +23,14 @@ export type Dictionary = {
 }
 
 const pt: Dictionary = {
-  nav: { projects: 'Projetos', newsletter: 'Boletim', contact: 'Contato' },
+  nav: {
+    projects: 'Projetos',
+    // Deliberately identical to the English value: "Newsletter" is the term
+    // used in Portuguese too, and is the exact word the project owner used
+    // when specifying this feature. Do not "fix" this back to a translation.
+    newsletter: 'Newsletter',
+    contact: 'Contato',
+  },
   home: {
     availableNow: 'disponível para oportunidades',
     featuredProjects: 'Projetos',

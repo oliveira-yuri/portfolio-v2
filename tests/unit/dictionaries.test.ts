@@ -4,7 +4,7 @@ import { LANGS } from '@/lib/content/types'
 
 describe('getDictionary', () => {
   it('returns different copy per language', () => {
-    expect(getDictionary('pt').nav.newsletter).not.toBe(getDictionary('en').nav.newsletter)
+    expect(getDictionary('pt').nav.projects).not.toBe(getDictionary('en').nav.projects)
   })
 
   it('defines the same keys for every language, so no string falls back silently', () => {
