@@ -10,6 +10,10 @@ describe('getProjects', () => {
 
   it('sorts ascending by order', () => {
     const orders = getProjects('pt').map((p) => p.order)
+    // Guard against the assertion below going vacuous: with fewer than two
+    // entries, any comparator (including a reversed one) trivially satisfies
+    // "already sorted".
+    expect(orders.length).toBeGreaterThanOrEqual(2)
     expect(orders).toEqual([...orders].sort((a, b) => a - b))
   })
 
