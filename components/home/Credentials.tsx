@@ -18,7 +18,7 @@ export function Credentials({
     <Section id="education" title={dict.home.education}>
       <ul className="flex flex-col gap-4">
         {education.map((item) => (
-          <li key={`${item.institution}-${item.title}`} className="flex justify-between gap-4">
+          <li key={`${item.institution}-${item.title}-${item.year}`} className="flex justify-between gap-4">
             <span>
               <span className="text-[var(--color-text)]">{item.title}</span>
               <span className="u-mono ml-3 text-[10px] text-[var(--color-dim)]">
@@ -37,7 +37,7 @@ export function Credentials({
           </h3>
           <ul className="flex flex-col gap-4">
             {certifications.map((item) => (
-              <li key={`${item.issuer}-${item.title}`} className="flex justify-between gap-4">
+              <li key={`${item.issuer}-${item.title}-${item.year}`} className="flex justify-between gap-4">
                 <span>
                   {item.url ? (
                     <a

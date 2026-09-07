@@ -6,10 +6,13 @@ export function Contact({ lang, profile }: { lang: Lang; profile: Profile }) {
   const dict = getDictionary(lang)
 
   const links = [
-    { label: 'Email', href: `mailto:${profile.email}`, text: profile.email },
+    { label: dict.home.emailLabel, href: `mailto:${profile.email}`, text: profile.email },
+    // 'LinkedIn' and 'GitHub' are proper nouns spelled the same in every
+    // language — they stay hardcoded rather than living in the dictionary,
+    // where someone could "translate" a brand name.
     { label: 'LinkedIn', href: profile.linkedinUrl, text: profile.linkedinUrl },
     { label: 'GitHub', href: profile.githubUrl, text: profile.githubUrl },
-    { label: 'CV', href: profile.cvPath, text: dict.home.downloadCv },
+    { label: dict.home.cvLabel, href: profile.cvPath, text: dict.home.downloadCv },
   ]
 
   return (

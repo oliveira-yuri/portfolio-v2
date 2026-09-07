@@ -15,6 +15,8 @@ export type Dictionary = {
     downloadCv: string
     present: string
     viewCaseStudy: string
+    emailLabel: string
+    cvLabel: string
   }
   post: { readingTime: string; backToNewsletter: string; subscribeRss: string }
   project: { result: string; stack: string; repository: string; demo: string }
@@ -44,6 +46,8 @@ const pt: Dictionary = {
     downloadCv: 'Baixar currículo',
     present: 'atual',
     viewCaseStudy: 'Ver estudo de caso',
+    emailLabel: 'E-mail',
+    cvLabel: 'Currículo',
   },
   post: {
     readingTime: 'min de leitura',
@@ -74,6 +78,8 @@ const en: Dictionary = {
     downloadCv: 'Download résumé',
     present: 'present',
     viewCaseStudy: 'View case study',
+    emailLabel: 'Email',
+    cvLabel: 'Résumé',
   },
   post: {
     readingTime: 'min read',
