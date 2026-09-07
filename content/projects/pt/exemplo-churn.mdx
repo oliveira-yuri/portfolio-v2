@@ -1,0 +1,25 @@
+---
+title: "Previsão de churn em base de assinaturas"
+summary: "Modelo que antecipa cancelamento com 30 dias de folga."
+result: "Recall de 0.81 na base de validação, contra 0.62 da regra manual anterior."
+stack: ["Python", "pandas", "scikit-learn"]
+order: 1
+repoUrl: "https://github.com/oliveira-yuri/exemplo-churn"
+placeholder: true
+---
+
+## Contexto
+
+A operação identificava risco de cancelamento por uma regra manual baseada em
+dias sem acesso, que só percebia o problema quando já era tarde.
+
+## Decisões técnicas
+
+Escolhi começar por regressão logística em vez de um modelo mais complexo,
+porque o time precisava explicar cada alerta para o cliente. Um modelo que
+ninguém consegue justificar não é usado.
+
+## Resultado
+
+Recall subiu de 0.62 para 0.81, mantendo a explicabilidade que a operação
+exigia.
