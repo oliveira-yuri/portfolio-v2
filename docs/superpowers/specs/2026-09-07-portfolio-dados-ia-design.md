@@ -234,7 +234,7 @@ Coluna única na largura de leitura definida em 4.2. Metadados em mono puro no t
 ## 7. Publicação
 
 - `git init` no diretório (hoje não é repositório), `.gitignore` cobrindo `node_modules`, `.next`, `out` e `.superpowers/`.
-- Repositório no GitHub; Vercel conectada, publicando a cada push.
+- Repositório: <https://github.com/oliveira-yuri/portfolio-v2>. Vercel conectada a ele, publicando a cada push na branch `main`.
 - Domínio próprio apontado para a Vercel.
 - `sitemap.xml`, `robots.txt`, metadados por página e imagem de compartilhamento gerada no build — o link precisa ficar apresentável quando compartilhado no LinkedIn.
 - Vercel Analytics, sem cookies.
