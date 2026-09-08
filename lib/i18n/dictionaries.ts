@@ -40,7 +40,7 @@ const pt: Dictionary = {
     contact: 'Contato',
   },
   home: {
-    siteDescription: 'Portfólio e newsletter sobre dados e inteligência artificial.',
+    siteDescription: 'Portfólio e newsletter sobre automação e inteligência artificial aplicada.',
     availableNow: 'disponível para oportunidades',
     featuredProjects: 'Projetos',
     experience: 'Experiência',
@@ -74,7 +74,7 @@ const pt: Dictionary = {
 const en: Dictionary = {
   nav: { projects: 'Projects', newsletter: 'Newsletter', contact: 'Contact' },
   home: {
-    siteDescription: 'Portfolio and newsletter on data and artificial intelligence.',
+    siteDescription: 'Portfolio and newsletter on automation and applied artificial intelligence.',
     availableNow: 'available for opportunities',
     featuredProjects: 'Projects',
     experience: 'Experience',

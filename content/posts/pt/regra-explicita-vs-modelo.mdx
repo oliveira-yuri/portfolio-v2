@@ -1,0 +1,76 @@
+---
+title: "Quando a regra explícita vence o modelo"
+summary: "Nem toda decisão dentro de uma automação deveria ser tomada por um LLM. O critério que uso para escolher."
+date: "2026-09-08"
+tags: ["automação", "n8n", "ia"]
+---
+
+Quando montei um agente de WhatsApp para fazer a triagem inicial dos contatos de
+um escritório de advocacia, a parte que mais me tomou tempo não foi a
+integração. Foi decidir quem decide: o modelo de linguagem ou uma regra escrita
+por mim.
+
+A resposta parece óbvia hoje — o modelo entende linguagem natural melhor do que
+qualquer `if` que eu escreva. Mas a triagem não terminava em entender a mensagem.
+Ela terminava em mandar a pessoa para um advogado específico. E aí a pergunta
+muda.
+
+## O que acontece quando a decisão erra
+
+Um classificador que erra a área do direito não produz uma resposta um pouco
+pior. Ele produz uma pessoa conversando com o profissional errado sobre um
+problema que costuma ser urgente e quase sempre é constrangedor de repetir.
+
+Esse é o teste que passei a aplicar antes de delegar uma decisão ao modelo:
+**qual é o custo do erro, e quem paga por ele?** Se o erro é barato e o próprio
+usuário corrige na mensagem seguinte, o modelo é a escolha certa — ele acerta
+mais e escrever a regra equivalente seria trabalho perdido. Se o erro é caro,
+recai sobre alguém que não está na sala, e ninguém percebe que aconteceu, a
+regra explícita ganha mesmo acertando menos.
+
+Note que o critério não é "o modelo é confiável?". É o custo assimétrico. Um
+classificador com 95% de acerto é excelente num lugar e inaceitável em outro, e
+o número sozinho não diz qual é qual.
+
+## O segundo motivo: dá para apontar o erro
+
+Existe uma diferença prática entre um fluxo que erra e um fluxo que erra e você
+consegue explicar por quê.
+
+Com lógica condicional, quando uma triagem sai errada eu abro a execução no n8n
+e vejo exatamente qual resposta levou àquela classificação. A correção é uma
+linha. Com o modelo decidindo livremente, o que eu tenho é uma saída ruim e um
+prompt para ajustar no escuro — e a mesma pergunta amanhã pode produzir outra
+coisa.
+
+Num contexto onde alguém pode precisar prestar contas do que o sistema fez, isso
+deixa de ser preferência de engenharia. Uma regra é auditável. Um prompt é uma
+tentativa.
+
+## Onde o modelo continua sendo a melhor peça
+
+Nada disso é argumento contra usar IA na automação. É argumento contra usar IA
+para a decisão de roteamento.
+
+No mesmo fluxo, o modelo faz muito bem o que ele faz melhor que qualquer regra:
+entender uma mensagem escrita às pressas, com erro de digitação e sem pontuação,
+e extrair dela os dados que a regra precisa — do que se trata, se já houve
+contato antes, se a pessoa mencionou prazo. O modelo interpreta. A regra decide.
+
+Essa separação é o desenho que eu repito hoje: extração e compreensão com
+modelo, decisão com condição explícita. Ela custa mais para escrever do que
+entregar tudo ao modelo, e vale a pena exatamente nos fluxos em que alguém
+depende do resultado.
+
+## O resumo que eu queria ter lido antes
+
+Antes de colocar um LLM no meio de um fluxo, vale responder três perguntas:
+
+1. Se essa decisão sair errada, quem sente — o usuário, que corrige na hora, ou
+   um terceiro, que talvez nem descubra?
+2. Daqui a um mês, eu consigo explicar por que o sistema decidiu aquilo?
+3. O modelo está aqui para *interpretar* uma entrada bagunçada, ou para
+   *escolher* o que acontece depois?
+
+Se a resposta da terceira for "escolher", pense duas vezes. Quase sempre o que
+eu queria era a primeira.

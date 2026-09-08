@@ -2,6 +2,9 @@ import { expect, test } from '@playwright/test'
 
 const SECTIONS = ['hero', 'projects', 'experience', 'education', 'skills', 'posts', 'contact']
 
+const POST_SLUG = 'regra-explicita-vs-modelo'
+const PROJECT_SLUG = 'integracao-leads-salesforce'
+
 test.describe('home', () => {
   for (const lang of ['pt', 'en']) {
     test(`renders all seven sections in ${lang}`, async ({ page }) => {
@@ -22,16 +25,16 @@ test.describe('home', () => {
 })
 
 test('the language switcher keeps the visitor on the equivalent page', async ({ page }) => {
-  await page.goto('/pt/newsletter/exemplo-limpeza-dados/')
+  await page.goto(`/pt/newsletter/${POST_SLUG}/`)
 
   const toEnglish = page.getByRole('link', { name: 'EN', exact: true })
   // The href starts as the English home and is rewritten on hydration; waiting
   // for the rewritten value both proves the swap happened and keeps the click
   // from racing hydration.
-  await expect(toEnglish).toHaveAttribute('href', '/en/newsletter/exemplo-limpeza-dados/')
+  await expect(toEnglish).toHaveAttribute('href', `/en/newsletter/${POST_SLUG}/`)
   await toEnglish.click()
 
-  await expect(page).toHaveURL(/\/en\/newsletter\/exemplo-limpeza-dados\/?$/)
+  await expect(page).toHaveURL(new RegExp(`/en/newsletter/${POST_SLUG}/?$`))
   await expect(page.locator('article h1')).toBeVisible()
 })
 
@@ -47,20 +50,28 @@ test('an article opens from the newsletter listing', async ({ page }) => {
   await expect(page.locator('article h1')).toBeVisible()
 })
 
-test('an untranslated article shows the notice and links to the version that exists', async ({
-  page,
-}) => {
-  await page.goto('/en/newsletter/exemplo-somente-portugues/')
-  const notice = page.getByTestId('translation-missing')
-  await expect(notice).toBeVisible()
-  await notice.getByRole('link').click()
-  await expect(page).toHaveURL(/\/pt\/newsletter\/exemplo-somente-portugues/)
+test('the newsletter offers a feed that parses as RSS', async ({ page, request }) => {
+  await page.goto('/pt/newsletter/')
+  const feed = page.locator('main a[href$="rss.xml"]')
+  await expect(feed).toBeVisible()
+
+  const response = await request.get((await feed.getAttribute('href')) as string)
+  expect(response.status()).toBe(200)
+  const body = await response.text()
+  expect(body).toContain('<channel>')
+  expect(body).toContain('<item>')
 })
+
+// The "no translation" notice has no e2e coverage right now: it needs content
+// that exists in one language only, and everything published today is
+// translated. The logic behind it is covered in tests/unit/posts.test.ts
+// against fixtures. Restore a case here the first time an untranslated article
+// ships.
 
 test('a case study opens from the home page', async ({ page }) => {
   await page.goto('/pt/')
   await page.locator('#projects a').first().click()
-  await expect(page).toHaveURL(/\/pt\/projects\//)
+  await expect(page).toHaveURL(new RegExp(`/pt/projects/${PROJECT_SLUG}/?$`))
   await expect(page.locator('article h1')).toBeVisible()
 })
 
@@ -72,4 +83,6 @@ test('the CV is downloadable', async ({ page, request }) => {
   expect(response.status()).toBe(200)
   const body = await response.body()
   expect(body.subarray(0, 4).toString()).toBe('%PDF')
+  // A 15-byte "%PDF-1.4 %%EOF" stub would pass the header check above.
+  expect(body.length).toBeGreaterThan(10_000)
 })
