@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { notFound } from 'next/navigation'
 import { Recursive } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
 import { LANGS, isLang } from '@/lib/content/types'
 import { SiteHeader } from '@/components/SiteHeader'
 import { SITE_NAME, SITE_URL } from '@/lib/site'
@@ -43,6 +44,7 @@ export default async function LangLayout({
           <SiteHeader lang={lang} />
           {children}
         </div>
+        <Analytics />
       </body>
     </html>
   )

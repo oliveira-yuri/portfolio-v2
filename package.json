@@ -28,6 +28,7 @@
   },
   "homepage": "https://github.com/oliveira-yuri/portfolio-v2#readme",
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "gray-matter": "^4.0.3",
     "next": "^16.3.4",
     "next-mdx-remote": "^6.0.0",
