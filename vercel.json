@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/pt/",
+      "permanent": false
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(pt|en)/opengraph-image",
+      "headers": [{ "key": "Content-Type", "value": "image/png" }]
+    }
+  ]
+}

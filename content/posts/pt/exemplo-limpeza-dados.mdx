@@ -1,0 +1,21 @@
+---
+title: "Como limpei 40 mil linhas sem perder o sono"
+summary: "Um roteiro de limpeza que não desfaz o próprio trabalho."
+date: "2026-03-14"
+tags: ["dados", "pandas"]
+placeholder: true
+---
+
+O conjunto tinha datas em quatro formatos diferentes, valores negativos onde não
+deveria haver, e duplicatas que só apareciam depois que eu normalizava o nome do
+cliente.
+
+Comecei mapeando cada problema antes de escrever uma linha de correção, porque
+corrigir na ordem errada desfaz o trabalho anterior.
+
+```python
+df = df.drop_duplicates(subset=chave)
+```
+
+O resultado foi uma base estável, com o número final batendo com o relatório
+antigo.

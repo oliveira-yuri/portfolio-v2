@@ -1,0 +1,25 @@
+---
+title: "Pipeline de ingestão e limpeza de dados de vendas"
+summary: "Automação que substitui planilhas manuais por um pipeline versionado."
+result: "Tempo de consolidação mensal caiu de 3 dias para 40 minutos, sem intervenção manual."
+stack: ["Python", "SQL", "Airflow"]
+order: 2
+placeholder: true
+---
+
+## Contexto
+
+Os relatórios de vendas eram montados à mão a partir de exportações de
+planilhas diferentes, um processo lento e sujeito a erro humano a cada
+fechamento de mês.
+
+## Decisões técnicas
+
+Optei por um pipeline com etapas explícitas de extração, validação e carga,
+em vez de um script único, para que cada falha apontasse exatamente onde os
+dados pararam de bater.
+
+## Resultado
+
+A consolidação mensal caiu de 3 dias de trabalho manual para 40 minutos de
+execução automatizada, com um log auditável de cada etapa.

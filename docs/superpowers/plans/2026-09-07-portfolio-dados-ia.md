@@ -406,7 +406,10 @@ Replace `app/globals.css` with:
   --color-dim: #6F827A;
   --color-accent: #4ADE80;
 
-  --font-recursive: var(--font-recursive), ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Consumes the variable next/font defines on <html>. Must NOT be named
+     --font-recursive: that name is next/font's, and a token referring to
+     itself resolves to nothing and silently falls back to the browser default. */
+  --font-mono: var(--font-recursive), ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
 html {
@@ -416,7 +419,7 @@ html {
 body {
   background: var(--color-bg);
   color: var(--color-text);
-  font-family: var(--font-recursive);
+  font-family: var(--font-mono);
   font-variation-settings: 'MONO' 0.3, 'CASL' 0.3;
   -webkit-font-smoothing: antialiased;
 }
@@ -2777,7 +2780,7 @@ git commit -m "feat: add case study pages"
 - Create: `tests/unit/feed.test.ts`
 
 **Interfaces:**
-- Consumes: `getPosts`, `getPostSlugs`, `getProjectSlugs`, `getProfile`, `LANGS`.
+- Consumes: `getPosts`, `getProjects`, `getProfile`, `LANGS`.
 - Produces:
   - `SITE_URL: string` and `SITE_NAME: string` in `lib/site.ts`
   - `buildRssXml(lang: Lang, posts: PostMeta[]): string` in `lib/feed.ts`
@@ -2863,7 +2866,12 @@ import { SITE_NAME, SITE_URL } from './site'
 import type { Lang, PostMeta } from './content/types'
 
 function escapeXml(value: string): string {
-  return value.replace(/[<>&'"]|[^ -]/g, (char) => {
+  // Escapes the five XML-significant characters, plus every character
+  // outside printable ASCII as a numeric entity, for maximum feed-reader
+  // compatibility. Written as [^ -~] on purpose: an \xNN range here is easy
+  // to corrupt into literal control bytes that are invisible in a source
+  // file and silently change what the character class matches.
+  return value.replace(/[<>&'"]|[^ -~]/g, (char) => {
     if (char === '<') return '&lt;'
     if (char === '>') return '&gt;'
     if (char === '&') return '&amp;'
@@ -2952,8 +2960,8 @@ export async function GET(
 ```ts
 import type { MetadataRoute } from 'next'
 import { LANGS } from '@/lib/content/types'
-import { getPostSlugs } from '@/lib/content/posts'
-import { getProjectSlugs } from '@/lib/content/projects'
+import { getPosts } from '@/lib/content/posts'
+import { getProjects } from '@/lib/content/projects'
 import { SITE_URL } from '@/lib/site'
 
 export const dynamic = 'force-static'
@@ -2964,15 +2972,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/${lang}/newsletter`, priority: 0.8 },
   ])
 
-  const posts = getPostSlugs().map(({ lang, slug }) => ({
-    url: `${SITE_URL}/${lang}/newsletter/${slug}`,
-    priority: 0.6,
-  }))
+  // Built from getPosts/getProjects, not the slug lists: those emit every slug
+  // for BOTH languages, including pages that only render a "no translation"
+  // notice. Submitting those to search engines would index placeholders as
+  // content. These readers already filter to translations that exist.
+  const posts = LANGS.flatMap((lang) =>
+    getPosts(lang).map((post) => ({
+      url: `${SITE_URL}/${lang}/newsletter/${post.slug}`,
+      priority: 0.6,
+    })),
+  )
 
-  const projects = getProjectSlugs().map(({ lang, slug }) => ({
-    url: `${SITE_URL}/${lang}/projects/${slug}`,
-    priority: 0.7,
-  }))
+  const projects = LANGS.flatMap((lang) =>
+    getProjects(lang).map((project) => ({
+      url: `${SITE_URL}/${lang}/projects/${project.slug}`,
+      priority: 0.7,
+    })),
+  )
 
   return [...roots, ...projects, ...posts].map((entry) => ({
     ...entry,
