@@ -61,6 +61,13 @@ export function getPost(lang: Lang, slug: string): Post | TranslationMissing | n
   const direct = readPost(lang, slug)
   if (direct) return direct
 
+  // The probe below reads the post in the other language through readPost,
+  // which runs assertPublishable on it. That is deliberate: it means the
+  // "read it in the other language" notice can only ever point at an article
+  // that is actually publishable — a placeholder-only fallback throws instead
+  // of being offered as a substitute. Do not "simplify" this into a bare
+  // fs.existsSync check; that would let the notice link to example content in
+  // production.
   const fallbackLang = LANGS.find((candidate) => candidate !== lang && readPost(candidate, slug))
   if (!fallbackLang) return null
 
