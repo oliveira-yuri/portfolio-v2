@@ -56,4 +56,6 @@ test('the CV is downloadable', async ({ page, request }) => {
   expect(href).toBeTruthy()
   const response = await request.get(href as string)
   expect(response.status()).toBe(200)
+  const body = await response.body()
+  expect(body.subarray(0, 4).toString()).toBe('%PDF')
 })

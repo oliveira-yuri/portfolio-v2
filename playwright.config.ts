@@ -9,7 +9,10 @@ export default defineConfig({
   webServer: {
     command: 'npx serve out -l 4321 --no-clipboard',
     url: 'http://127.0.0.1:4321/pt/',
-    reuseExistingServer: !process.env.CI,
+    // Never reuse a server left running from an earlier run: this suite exists to
+    // catch breakage in the static export, and reusing a stale `serve out` process
+    // would let it report green against yesterday's build instead of this one.
+    reuseExistingServer: false,
     timeout: 120_000,
   },
 })
