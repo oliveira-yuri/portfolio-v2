@@ -21,7 +21,21 @@ test.describe('home', () => {
   })
 })
 
-test('the language switcher moves the visitor to the other language', async ({ page }) => {
+test('the language switcher keeps the visitor on the equivalent page', async ({ page }) => {
+  await page.goto('/pt/newsletter/exemplo-limpeza-dados/')
+
+  const toEnglish = page.getByRole('link', { name: 'EN', exact: true })
+  // The href starts as the English home and is rewritten on hydration; waiting
+  // for the rewritten value both proves the swap happened and keeps the click
+  // from racing hydration.
+  await expect(toEnglish).toHaveAttribute('href', '/en/newsletter/exemplo-limpeza-dados/')
+  await toEnglish.click()
+
+  await expect(page).toHaveURL(/\/en\/newsletter\/exemplo-limpeza-dados\/?$/)
+  await expect(page.locator('article h1')).toBeVisible()
+})
+
+test('the language switcher still moves home to home', async ({ page }) => {
   await page.goto('/pt/')
   await page.getByRole('link', { name: 'EN', exact: true }).click()
   await expect(page).toHaveURL(/\/en\/?$/)
