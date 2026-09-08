@@ -23,9 +23,21 @@ describe('buildRssXml', () => {
     expect(xml).toContain('<rss version="2.0"')
   })
 
-  it('escapes XML-significant characters in the title', () => {
-    expect(xml).toContain('T&#237;tulo com &amp; e &lt;tags&gt;')
+  it('escapes XML-significant characters in the title, and nothing else', () => {
+    expect(xml).toContain('Título com &amp; e &lt;tags&gt;')
     expect(xml).not.toContain('<tags>')
+  })
+
+  it('keeps astral characters intact instead of emitting lone surrogate references', () => {
+    const withEmoji = buildRssXml('pt', [
+      { ...posts[0], slug: 'emoji', title: 'Deploy 🚀 em produção' },
+    ])
+
+    expect(withEmoji).toContain('<title>Deploy 🚀 em produção</title>')
+    // A surrogate pair escaped code-unit by code-unit would appear as
+    // `&#55357;&#56960;` — both halves start with `&#5`.
+    expect(withEmoji).not.toContain('&#5')
+    expect(withEmoji).not.toMatch(/&#\d+;/)
   })
 
   it('emits one item per post', () => {

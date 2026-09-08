@@ -1,14 +1,23 @@
 import { SITE_NAME, SITE_URL } from './site'
 import type { Lang, PostMeta } from './content/types'
 
+// Only the five XML-significant characters are escaped. The document declares
+// UTF-8, so every other character — accents, emoji, CJK — is already legal and
+// must be emitted literally.
+//
+// Do NOT widen this character class to cover non-ASCII. `String.replace`
+// iterates UTF-16 code units, so any character above U+FFFF (every emoji) is
+// seen as two lone surrogates and `charCodeAt(0)` turns it into a pair of
+// numeric references such as `&#55357;&#56960;`. Lone surrogates are not legal
+// XML characters, so a single emoji in a single title makes that language's
+// whole feed unparseable, and readers drop it silently.
 function escapeXml(value: string): string {
-  return value.replace(/[<>&'"]|[^ -~]/g, (char) => {
+  return value.replace(/[<>&'"]/g, (char) => {
     if (char === '<') return '&lt;'
     if (char === '>') return '&gt;'
     if (char === '&') return '&amp;'
     if (char === "'") return '&apos;'
-    if (char === '"') return '&quot;'
-    return `&#${char.charCodeAt(0)};`
+    return '&quot;'
   })
 }
 
