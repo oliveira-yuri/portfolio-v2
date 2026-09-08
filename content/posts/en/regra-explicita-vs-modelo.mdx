@@ -1,0 +1,77 @@
+---
+title: "When an explicit rule beats the model"
+summary: "Not every decision inside an automation should be made by an LLM. The test I use to choose."
+date: "2026-09-08"
+tags: ["automation", "n8n", "ai"]
+---
+
+When I built a WhatsApp agent to run first-line triage for a law firm's incoming
+contacts, the part that took the most time was not the integration. It was
+deciding who decides: the language model, or a rule I write myself.
+
+The answer looks obvious today — a model understands natural language better
+than any `if` I could write. But the triage did not end at understanding the
+message. It ended at sending a person to a specific lawyer. And that changes the
+question.
+
+## What happens when the decision is wrong
+
+A classifier that picks the wrong area of law does not produce a slightly worse
+answer. It produces a person talking to the wrong professional about a problem
+that is usually urgent and almost always uncomfortable to repeat.
+
+That is the test I now apply before handing a decision to the model: **how
+expensive is the error, and who pays for it?** If the error is cheap and the
+user corrects it in the next message, the model is the right call — it is right
+more often, and writing the equivalent rule would be wasted work. If the error
+is expensive, lands on someone who is not in the room, and nobody notices it
+happened, the explicit rule wins even though it is right less often.
+
+Note that the criterion is not "is the model reliable?". It is the asymmetry of
+the cost. A classifier that is right 95% of the time is excellent in one place
+and unacceptable in another, and the number alone does not tell you which.
+
+## The second reason: you can point at the mistake
+
+There is a practical difference between a flow that gets things wrong and a flow
+that gets things wrong in a way you can explain.
+
+With conditional logic, when a triage comes out wrong I open the execution in
+n8n and see exactly which answer produced that classification. The fix is one
+line. With the model deciding freely, what I have is a bad output and a prompt
+to adjust in the dark — and the same question tomorrow may produce something
+else.
+
+In a context where someone may have to account for what the system did, this
+stops being an engineering preference. A rule is auditable. A prompt is an
+attempt.
+
+## Where the model is still the best part
+
+None of this is an argument against using AI in automation. It is an argument
+against using AI for the routing decision.
+
+In that same flow, the model does very well what it does better than any rule:
+understanding a message written in a hurry, with typos and no punctuation, and
+pulling out of it the data the rule needs — what this is about, whether there
+was prior contact, whether the person mentioned a deadline. The model
+interprets. The rule decides.
+
+That separation is the design I keep reaching for: extraction and comprehension
+by the model, decisions by explicit conditions. It costs more to write than
+handing everything to the model, and it pays off in exactly the flows where
+somebody depends on the result.
+
+## The summary I wish I had read first
+
+Before putting an LLM in the middle of a flow, three questions are worth
+answering:
+
+1. If this decision comes out wrong, who feels it — the user, who fixes it on
+   the spot, or a third party, who may never find out?
+2. A month from now, can I explain why the system decided that?
+3. Is the model here to *interpret* a messy input, or to *choose* what happens
+   next?
+
+If the answer to the third is "choose", think twice. Almost every time, what I
+actually wanted was the first.

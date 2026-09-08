@@ -26,7 +26,7 @@ describe('getProjects', () => {
 
 describe('getProject', () => {
   it('returns a project with a body', () => {
-    const project = getProject('pt', 'exemplo-churn')
+    const project = getProject('pt', 'integracao-leads-salesforce')
     expect(project).not.toBeNull()
     if (project && !isTranslationMissing(project)) {
       expect(project.body.length).toBeGreaterThan(0)

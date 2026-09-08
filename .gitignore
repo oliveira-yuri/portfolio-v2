@@ -11,3 +11,8 @@ out/
 /playwright-report/
 /blob-report/
 /.playwright/
+
+# Documentos-fonte (CV e certificados originais). Ficam fora do repositório de
+# propósito: o certificado da InterFatecs traz o CPF no link de verificação, e o
+# repositório é público. O currículo que vai ao ar é a cópia em public/cv/.
+/docs/content/

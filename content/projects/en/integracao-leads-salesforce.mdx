@@ -1,0 +1,28 @@
+---
+title: "Lead integration with Salesforce"
+summary: "An automation that moves a lead from the form into the CRM with nobody typing."
+result: "Removed manual lead entry in Salesforce, and the re-keying rework that came with it."
+stack: ["n8n", "Salesforce API", "Google Sheets", "Webhooks"]
+order: 1
+---
+
+## Context
+
+The sales team received leads through several channels and entered each one into
+Salesforce by hand. Beyond the time it cost, manual entry created two quiet
+problems: leads sitting for hours before reaching the CRM, and the same contact
+recorded twice by different people.
+
+## How it works
+
+I built the flow in n8n: a webhook receives the lead, the automation normalises
+the data, queries Salesforce through its API to decide whether the contact is
+new or already known, and routes it to the right owner. Google Sheets acts as a
+logging layer — you can audit what went through the flow without opening the
+CRM.
+
+## Result
+
+Manual entry left the process. Leads land in Salesforce already qualified and
+routed, and the sales team spends its time on the conversation rather than on
+data entry.

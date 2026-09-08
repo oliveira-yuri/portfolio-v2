@@ -1,0 +1,33 @@
+---
+title: "Automated SDR for a law firm"
+summary: "A WhatsApp agent that runs first-line triage before a human takes over."
+result: "Leads reach the lawyer already sorted by area of law, instead of arriving in one undifferentiated queue."
+stack: ["n8n", "WhatsApp API", "Webhooks"]
+order: 2
+---
+
+## Context
+
+Every new contact for the firm landed in the same WhatsApp inbox: an employment
+case, a family-law question and someone who just wanted the address, all mixed
+together. Somebody had to read everything before forwarding it, and urgent
+matters waited behind simple questions.
+
+## How it works
+
+I built an agent in n8n connected to the WhatsApp API. It runs the opening
+conversation with conditional logic: it identifies the practice area from the
+answers, qualifies the contact, and only then forwards it. The triage is
+identical regardless of the hour or of who happens to be available.
+
+## Design decision
+
+I chose explicit conditional logic over letting a model decide freely. In a
+legal context, triage that picks the wrong area sends a person to the wrong
+lawyer — and an explicit rule is auditable: you can point at exactly which
+answer produced a given classification.
+
+## Result
+
+The lawyer receives each contact already classified and qualified. The queue
+stopped being an undifferentiated list and started arriving sorted by area.

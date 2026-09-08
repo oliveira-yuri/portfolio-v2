@@ -1,5 +1,20 @@
-import { describe, expect, it } from 'vitest'
+import path from 'node:path'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 import { getPost, getPosts, getPostSlugs, isTranslationMissing } from '@/lib/content/posts'
+
+// The site ships with no articles yet, so these tests read from
+// `tests/fixtures/content` instead of `content/`. Pointing them at real content
+// would make every assertion below vacuous the moment the newsletter is empty —
+// "sorted" and "hides the untranslated post" are both trivially true of an
+// empty list. The fixtures keep the behaviour under test regardless of what is
+// published.
+beforeAll(() => {
+  vi.stubEnv('CONTENT_ROOT_OVERRIDE', path.join(process.cwd(), 'tests', 'fixtures', 'content'))
+})
+
+afterAll(() => {
+  vi.unstubAllEnvs()
+})
 
 describe('getPosts', () => {
   it('returns Portuguese posts', () => {
@@ -9,6 +24,9 @@ describe('getPosts', () => {
 
   it('sorts newest first', () => {
     const dates = getPosts('pt').map((p) => p.date)
+    // Guard against the assertion below going vacuous: with fewer than two
+    // entries, any order trivially counts as sorted.
+    expect(dates.length).toBeGreaterThanOrEqual(2)
     const sorted = [...dates].sort((a, b) => b.localeCompare(a))
     expect(dates).toEqual(sorted)
   })
@@ -22,8 +40,8 @@ describe('getPosts', () => {
   it('hides a post from the language that has no translation', () => {
     const ptSlugs = getPosts('pt').map((p) => p.slug)
     const enSlugs = getPosts('en').map((p) => p.slug)
-    expect(ptSlugs).toContain('exemplo-somente-portugues')
-    expect(enSlugs).not.toContain('exemplo-somente-portugues')
+    expect(ptSlugs).toContain('so-em-portugues')
+    expect(enSlugs).not.toContain('so-em-portugues')
   })
 
   it('tags every post with the language it was read from', () => {
@@ -33,7 +51,7 @@ describe('getPosts', () => {
 
 describe('getPost', () => {
   it('returns the post body when the translation exists', () => {
-    const post = getPost('pt', 'exemplo-limpeza-dados')
+    const post = getPost('pt', 'artigo-traduzido')
     expect(isTranslationMissing(post)).toBe(false)
     expect(post).not.toBeNull()
     if (post && !isTranslationMissing(post)) {
@@ -43,12 +61,12 @@ describe('getPost', () => {
   })
 
   it('reports a missing translation instead of failing', () => {
-    const post = getPost('en', 'exemplo-somente-portugues')
+    const post = getPost('en', 'so-em-portugues')
     expect(isTranslationMissing(post)).toBe(true)
     if (post && isTranslationMissing(post)) {
       expect(post.requestedLang).toBe('en')
       expect(post.availableLang).toBe('pt')
-      expect(post.slug).toBe('exemplo-somente-portugues')
+      expect(post.slug).toBe('so-em-portugues')
     }
   })
 
@@ -60,14 +78,14 @@ describe('getPost', () => {
 describe('getPostSlugs', () => {
   it('includes every language/slug pair that should be built', () => {
     const pairs = getPostSlugs()
-    expect(pairs).toContainEqual({ lang: 'pt', slug: 'exemplo-limpeza-dados' })
-    expect(pairs).toContainEqual({ lang: 'en', slug: 'exemplo-limpeza-dados' })
+    expect(pairs).toContainEqual({ lang: 'pt', slug: 'artigo-traduzido' })
+    expect(pairs).toContainEqual({ lang: 'en', slug: 'artigo-traduzido' })
   })
 
   it('includes the untranslated slug for both languages so the notice page is built', () => {
     const pairs = getPostSlugs()
-    expect(pairs).toContainEqual({ lang: 'pt', slug: 'exemplo-somente-portugues' })
-    expect(pairs).toContainEqual({ lang: 'en', slug: 'exemplo-somente-portugues' })
+    expect(pairs).toContainEqual({ lang: 'pt', slug: 'so-em-portugues' })
+    expect(pairs).toContainEqual({ lang: 'en', slug: 'so-em-portugues' })
   })
 
   it('does not contain duplicates', () => {

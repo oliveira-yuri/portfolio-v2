@@ -1,0 +1,27 @@
+---
+title: "Integração de leads com o Salesforce"
+summary: "Automação que leva o lead do formulário ao CRM sem ninguém digitar."
+result: "Eliminou o cadastro manual de leads no Salesforce e o retrabalho de reentrada de dados na equipe comercial."
+stack: ["n8n", "API do Salesforce", "Google Sheets", "Webhooks"]
+order: 1
+---
+
+## Contexto
+
+A equipe comercial recebia leads por vários caminhos e cadastrava cada um à mão
+no Salesforce. Além do tempo gasto, o cadastro manual criava dois problemas
+silenciosos: lead que chegava e ficava horas sem entrar no CRM, e o mesmo
+contato registrado duas vezes por pessoas diferentes.
+
+## Como funciona
+
+Montei o fluxo no n8n: o webhook recebe o lead, a automação normaliza os dados,
+consulta o Salesforce pela API para decidir se é contato novo ou já existente, e
+faz o roteamento para o dono certo. O Google Sheets entra como camada de
+registro — dá para auditar o que passou pelo fluxo sem precisar abrir o CRM.
+
+## Resultado
+
+O cadastro manual saiu do processo. O lead entra no Salesforce já qualificado e
+roteado, e o time comercial passou a gastar o tempo no atendimento em vez da
+digitação.

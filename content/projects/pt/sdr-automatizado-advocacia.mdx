@@ -1,0 +1,33 @@
+---
+title: "SDR automatizado para escritório de advocacia"
+summary: "Agente no WhatsApp que faz a triagem inicial antes do atendimento humano."
+result: "Os leads chegam ao advogado já separados por área do direito, em vez de entrarem todos na mesma fila."
+stack: ["n8n", "WhatsApp API", "Webhooks"]
+order: 2
+---
+
+## Contexto
+
+Todo contato novo do escritório caía na mesma caixa de entrada do WhatsApp:
+consulta trabalhista, dúvida de família e quem só queria saber o endereço,
+misturados. Alguém precisava ler tudo antes de encaminhar, e casos urgentes
+esperavam atrás de perguntas simples.
+
+## Como funciona
+
+Construí um agente no n8n conectado à API do WhatsApp. Ele conduz a conversa
+inicial com lógica condicional: identifica a área do serviço pelas respostas,
+qualifica o contato e só então encaminha. A triagem é sempre a mesma,
+independente do horário ou de quem está disponível.
+
+## Decisão de projeto
+
+Optei por lógica condicional explícita em vez de deixar o modelo decidir livre.
+Em contexto jurídico, uma triagem que erra de área manda a pessoa para o
+advogado errado — e a regra explícita é auditável: dá para apontar exatamente
+qual resposta levou àquela classificação.
+
+## Resultado
+
+O advogado recebe o contato já classificado e qualificado. A fila deixou de ser
+uma lista indiferenciada e passou a chegar organizada por área.
